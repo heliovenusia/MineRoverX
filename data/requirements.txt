@@ -1,0 +1,10 @@
+streamlit>=1.38.0
+pandas
+numpy
+geopandas
+rasterio
+folium
+streamlit-folium
+richdem
+pyproj
+shapely
