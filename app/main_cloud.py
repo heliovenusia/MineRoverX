@@ -22,7 +22,7 @@ DEM_BOUNDS = [
 FLOW_PNG = DATA_DIR / "bolani_flowacc_overlay.png"
 SLOPE_PNG = DATA_DIR / "bolani_slope_overlay.png"
 
-# ───── Sidebar ─────
+
 with st.sidebar:
     st.markdown("## MineRoverX")
     st.markdown("Test Terrain Intelligence PoC (Bolani)")
@@ -94,6 +94,7 @@ with tab_map:
         ).add_to(m)
 
     folium.LayerControl().add_to(m)
-
+    if st.button("Re-center Map"):
+        m.fit_bounds(DEM_BOUNDS)
     st_folium(m, width="100%", height=500)
 
