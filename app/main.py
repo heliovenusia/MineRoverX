@@ -40,11 +40,7 @@ st.markdown("### MineRoverX PoC : Terrain Intelligence Dashboard")
 
 st.markdown(
     """
-A beginner's learning attempt inspired by AEREO presentation.
-This is a pipeline PoC to process DEM data from drones, satellites etc.
-Used NASA SRTM satellite data (30 mtr) instead of drone triangulation (5 cm) for flow/accumulation and terrain gradient..
-Hence, results might not be as insightful as from drone data.
-With high resolution data, additional features like differential volume can be explored.
+Using NASA SRTM satellite data
 
 """
 )
