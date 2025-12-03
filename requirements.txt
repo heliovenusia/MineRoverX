@@ -1,7 +1,3 @@
 streamlit
 streamlit-folium
 folium
-numpy
-matplotlib
-rasterio
-richdem

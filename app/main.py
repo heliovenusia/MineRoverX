@@ -14,7 +14,7 @@ st.set_page_config(
     page_title="MineRoverX",
     
     layout="wide",
-    initial_sidebar_state="collapsed",
+    
 )
 
 
@@ -29,7 +29,7 @@ with st.sidebar:
             "Google Satellite",
             
         ],
-        index=0,  # default ESRI Satellite
+        index=0,
     )
 
     show_flowacc = st.checkbox("Show Flow Accumulation / Drainage", value=True)
@@ -40,11 +40,11 @@ st.markdown("### MineRoverX PoC : Terrain Intelligence Dashboard")
 
 st.markdown(
     """
-Not a professional attempt, but a beginner's learner attempt inspired by AEREO presentation.
+A beginner's learning attempt inspired by AEREO presentation.
 This is a pipeline PoC to process DEM data from drones, satellites etc.
-Used NASA SRTS satellite data (30 mtr) instead of drone triangulation (5 cm).
+Used NASA SRTM satellite data (30 mtr) instead of drone triangulation (5 cm) for flow/accumulation and terrain gradient..
 Hence, results might not be as insightful as from drone data.
-With drone data, additional features like 'differential volume' can be explored.
+With high resolution data, additional features like differential volume can be explored.
 
 """
 )
