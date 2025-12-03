@@ -1,97 +1,131 @@
 import streamlit as st
 from streamlit_folium import st_folium
 import folium
-from pathlib import Path
-import os
 
-from utils.dem_tools import save_flowacc_overlay_png, DATA_DIR
+from utils.dem_tools import (
+    DATA_DIR,
+    get_dem_bounds,
+    save_flowacc_overlay_png,
+    save_slope_overlay_png,
+)
 
 
 st.set_page_config(
     page_title="MineRoverX",
-    page_icon="⛏️",
-    layout="wide",  
+    
+    layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
 
 with st.sidebar:
     st.markdown("## MineRoverX")
-    st.markdown("Terrain Intelligence for SAIL Mines - Test PoC")
+    st.markdown("Test Terrain Intelligence PoC (Bolani)")
 
-    st.markdown("### View Settings")
     basemap_choice = st.selectbox(
         "Basemap",
-        ["OpenStreetMap", "CartoDB Positron", "Stamen Terrain"],
-        index=0,
+        [
+            "ESRI Satellite",
+            "Google Satellite",
+            
+        ],
+        index=0,  # default ESRI Satellite
     )
-    show_flowacc = st.checkbox("Show Flow Accumulation / Drainage", value=False)
-  
 
-st.markdown("### MineRoverX : Terrain Intelligence Dashboard")
+    show_flowacc = st.checkbox("Show Flow Accumulation / Drainage", value=True)
+    show_slope = st.checkbox("Show Slope / Terrain Gradient", value=False)
+
+
+st.markdown("### MineRoverX : Terrain Intelligence Dashboard (PoC)")
 
 st.markdown(
     """
-This is the **initial skeleton** of the MineRoverX dashboard.  
-Right now it shows a dummy map; in later steps we'll add:
+Inspired by AEREO presentation, this is a beginner's attempt aiming for pipeline to process DEM images.
+Used NASA SRTS satellite data (30 mtr) instead of drone triangulation (5 cm).
 
-- Flow accumulation / drainage
-- Haul-road gradient
 """
 )
 
-col1, col2, col3, col4 = st.columns(4)
-
-col1.metric("Mine", "Bolani", "locked")
-col2.metric("DEM Source", "TBD", "-")
-col3.metric("Risk Hotspots", "0", "to be computed")
-col4.metric("Version", "1.0")
 
 st.markdown("---")
 
-tab_map, tab_about = st.tabs(["Map View", "About MineRoverX"])
+
+tab_map, tab_home = st.tabs(["Map View","Home"])
 
 with tab_map:
-    st.markdown("#### Terrain Map (Bolani region – DEM-based)")
+    st.markdown("#### Terrain Map (Bolani region – DEM-based overlays)")
 
-   
-    center_lat, center_lon = 22.1, 85.3
+    dem_path = DATA_DIR / "bolani_dem.tif"
 
-    if basemap_choice == "OpenStreetMap":
-        tiles = "OpenStreetMap"
-    elif basemap_choice == "CartoDB Positron":
-        tiles = "CartoDB positron"
+    # Decide basemap tiles
+    if basemap_choice == "ESRI Satellite":
+        tiles = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+        attr = "Esri World Imagery"
     else:
-        tiles = "Stamen Terrain"
+        tiles = "http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+        attr = "Google Satellite"
+    
 
-    m = folium.Map(location=[center_lat, center_lon], zoom_start=12, tiles=tiles)
+    if dem_path.exists():
+        bounds = get_dem_bounds(dem_path)  
 
-   
+        
+        m = folium.Map(tiles=None)
+        folium.TileLayer(
+            tiles=tiles,
+            attr=attr,
+            name=basemap_choice,
+        ).add_to(m)
+
+       
+        m.fit_bounds(bounds)
+
+    else:
+        st.error("DEM file 'data/bolani_dem.tif' not found.")
+        bounds = None
+        
+        center_lat, center_lon = 22.1, 85.3
+        m = folium.Map(location=[center_lat, center_lon], zoom_start=12, tiles=tiles)
+
+    
     folium.Marker(
-        location=[center_lat, center_lon],
-        popup="Bolani region (approx)",
-        tooltip="Bolani (approx)",
+        location=[22.1, 85.3],
+        popup="Bolani region (approximate)",
+        tooltip="Bolani (approximate)",
     ).add_to(m)
 
     
-    dem_path = DATA_DIR / "bolani_dem.tif"
-    if show_flowacc:
-        if dem_path.exists():
-            try:
-                png_path, bounds = save_flowacc_overlay_png()
-                folium.raster_layers.ImageOverlay(
-                    name="Flow Accumulation",
-                    image=str(png_path),
-                    bounds=bounds,
-                    opacity=1.0,
-                    interactive=False,
-                    cross_origin=False,
-                    zindex=3,
-                ).add_to(m)
-                folium.LayerControl().add_to(m)
-            except Exception as e:
-                st.error(f"Error creating flow accumulation overlay: {e}")
-        else:
-            st.warning("DEM file 'data/bolani_dem.tif' not found. Flow overlay disabled.")
+    if show_flowacc and dem_path.exists():
+        try:
+            fa_png, fa_bounds = save_flowacc_overlay_png(dem_path)
+            folium.raster_layers.ImageOverlay(
+                name="Flow Accumulation",
+                image=str(fa_png),
+                bounds=fa_bounds,
+                opacity=1.0,  # alpha is encoded in PNG
+                zindex=3,
+            ).add_to(m)
+        except Exception as e:
+            st.error(f"Error generating flow accumulation overlay: {e}")
 
+    
+    if show_slope and dem_path.exists():
+        try:
+            slope_png, slope_bounds = save_slope_overlay_png(dem_path)
+            folium.raster_layers.ImageOverlay(
+                name="Slope / Gradient",
+                image=str(slope_png),
+                bounds=slope_bounds,
+                opacity=1.0,  # alpha is encoded in PNG
+                zindex=4,
+            ).add_to(m)
+        except Exception as e:
+            st.error(f"Error generating slope overlay: {e}")
+
+   
+    folium.LayerControl().add_to(m)
+
+    
     st_folium(m, width="100%", height=500)
+
 

@@ -1,10 +1,7 @@
-streamlit>=1.38.0
-pandas
-numpy
-geopandas
-rasterio
-folium
+streamlit
 streamlit-folium
+folium
+numpy
+matplotlib
+rasterio
 richdem
-pyproj
-shapely
