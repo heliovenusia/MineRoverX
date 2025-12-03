@@ -5,7 +5,7 @@ from pathlib import Path
 
 st.set_page_config(
     page_title="MineRoverX",
-    
+    initial_sidebar_state="expanded",
     layout="wide",
     
 )
