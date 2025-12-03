@@ -36,12 +36,15 @@ with st.sidebar:
     show_slope = st.checkbox("Show Slope / Terrain Gradient", value=False)
 
 
-st.markdown("### MineRoverX : Terrain Intelligence Dashboard (PoC)")
+st.markdown("### MineRoverX PoC : Terrain Intelligence Dashboard")
 
 st.markdown(
     """
-Inspired by AEREO presentation, this is a beginner's attempt aiming for pipeline to process DEM images.
+Not a professional attempt, but a beginner's learner attempt inspired by AEREO presentation.
+This is a pipeline PoC to process DEM data from drones, satellites etc.
 Used NASA SRTS satellite data (30 mtr) instead of drone triangulation (5 cm).
+Hence, results might not be as insightful as from drone data.
+With drone data, additional features like 'differential volume' can be explored.
 
 """
 )
